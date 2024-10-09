@@ -1,5 +1,6 @@
 import pandas as pd
 import streamlit as st
+from sklearn import datasets
 
 
 def load_user_dataset():
@@ -26,4 +27,35 @@ def load_user_dataset():
             return None
     else:
         st.info("Awaiting file upload.")
+        return None
+
+def load_builtin_dataset(name):
+    """
+    Loads a built-in dataset from scikit-learn by name and returns a DataFrame.
+    """
+    try:
+        data_loaders = {
+            'Iris': datasets.load_iris,
+            'Wine': datasets.load_wine,
+            'Breast Cancer': datasets.load_breast_cancer,
+            'Diabetes': datasets.load_diabetes,
+            'Boston Housing': datasets.load_boston,
+            'California Housing': datasets.fetch_california_housing
+        }
+
+        if name not in data_loaders:
+            st.error("Dataset not found.")
+            return None
+
+        data = data_loaders[name]()
+        if hasattr(data, 'data'):
+            X = pd.DataFrame(data.data, columns=data.feature_names)
+        else:
+            X = pd.DataFrame(data['data'], columns=data['feature_names'])
+        y = pd.Series(data.target, name='target')
+        df = pd.concat([X, y], axis=1)
+        st.success(f"{name} dataset loaded successfully!")
+        return df
+    except Exception as e:
+        st.error(f"Error loading dataset: {e}")
         return None
