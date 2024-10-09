@@ -39,7 +39,6 @@ def load_builtin_dataset(name):
             'Wine': datasets.load_wine,
             'Breast Cancer': datasets.load_breast_cancer,
             'Diabetes': datasets.load_diabetes,
-            'Boston Housing': datasets.load_boston,
             'California Housing': datasets.fetch_california_housing
         }
 
