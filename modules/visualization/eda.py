@@ -52,3 +52,13 @@ def statistical_summaries(df):
                 st.write(df[col].value_counts())
     else:
         st.write("No categorical features selected.")
+
+def plot_histograms(df):
+    st.subheader("Histograms of Numerical Features")
+    numeric_cols = df.select_dtypes(include=np.number).columns.tolist()
+    selected_cols = st.multiselect("Select Numerical Columns for Histograms", numeric_cols)
+    bins = st.slider("Number of Bins", min_value=5, max_value=100, value=30)
+
+    for col in selected_cols:
+        fig = px.histogram(df, x=col, nbins=bins, title=f'Histogram of {col}')
+        st.plotly_chart(fig)
