@@ -98,3 +98,29 @@ def plot_scatter_plots(df):
         st.plotly_chart(fig)
     else:
         st.write("Not enough numerical features to create scatter plots.")
+
+def plot_pair_plots(df):
+    st.subheader("Pair Plot")
+    numeric_cols = df.select_dtypes(include=np.number).columns.tolist()
+    selected_cols = st.multiselect("Select Numerical Columns for Pair Plot", numeric_cols, default=numeric_cols)
+    if len(selected_cols) >= 2:
+        fig = sns.pairplot(df[selected_cols])
+        st.pyplot(fig)
+    else:
+        st.write("Select at least two numerical columns.")
+
+def categorical_vs_numerical(df):
+    st.subheader("Categorical vs Numerical Analysis")
+    categorical_cols = df.select_dtypes(include=['object', 'category']).columns.tolist()
+    numeric_cols = df.select_dtypes(include=np.number).columns.tolist()
+    if categorical_cols and numeric_cols:
+        cat_col = st.selectbox("Select Categorical Feature", categorical_cols)
+        num_col = st.selectbox("Select Numerical Feature", numeric_cols)
+        plot_type = st.selectbox("Select Plot Type", ['Box Plot', 'Violin Plot'])
+        if plot_type == 'Box Plot':
+            fig = px.box(df, x=cat_col, y=num_col, title=f'{num_col} Distribution across {cat_col}')
+        else:
+            fig = px.violin(df, x=cat_col, y=num_col, box=True, title=f'{num_col} Distribution across {cat_col}')
+        st.plotly_chart(fig)
+    else:
+        st.write("Insufficient categorical or numerical features for this analysis.")
