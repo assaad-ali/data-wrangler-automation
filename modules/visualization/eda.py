@@ -1,4 +1,5 @@
 import streamlit as st
+import time
 from modules.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -124,3 +125,29 @@ def categorical_vs_numerical(df):
         st.plotly_chart(fig)
     else:
         st.write("Insufficient categorical or numerical features for this analysis.")
+
+def data_filtering(df):
+    st.subheader("Data Filtering")
+    filter_columns = st.multiselect("Select Columns to Filter", df.columns.tolist())
+    query = ""
+    for col in filter_columns:
+        if is_numeric_dtype(df[col]):
+            min_val = float(df[col].min())
+            max_val = float(df[col].max())
+            values = st.slider(f"Select range for {col}", min_val, max_val, (min_val, max_val))
+            query += f"({col} >= {values[0]}) & ({col} <= {values[1]}) & "
+        elif is_categorical_dtype(df[col]) or df[col].dtype == 'object':
+            options = st.multiselect(f"Select values for {col}", df[col].unique())
+            if options:
+                query += f"({col} in @options) & "
+    if query:
+        query = query.rstrip(" & ")
+        filtered_df = df.query(query)
+        st.write(f"Filtered Data (showing top 5 rows):")
+        st.write(filtered_df.head())
+        return filtered_df
+    else:
+        st.write("No filters applied.")
+        return df
+
+
