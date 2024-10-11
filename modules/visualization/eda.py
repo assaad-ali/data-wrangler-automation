@@ -62,3 +62,12 @@ def plot_histograms(df):
     for col in selected_cols:
         fig = px.histogram(df, x=col, nbins=bins, title=f'Histogram of {col}')
         st.plotly_chart(fig)
+
+def plot_box_plots(df):
+    st.subheader("Box Plots of Numerical Features")
+    numeric_cols = df.select_dtypes(include=np.number).columns.tolist()
+    selected_cols = st.multiselect("Select Numerical Columns for Box Plots", numeric_cols)
+
+    for col in selected_cols:
+        fig = px.box(df, y=col, title=f'Box Plot of {col}')
+        st.plotly_chart(fig)
