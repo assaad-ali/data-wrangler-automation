@@ -86,3 +86,15 @@ def plot_correlation_matrix(df):
             st.write("Select at least two numerical columns.")
     else:
         st.write("No numerical features available for correlation matrix.")
+
+def plot_scatter_plots(df):
+    st.subheader("Scatter Plots")
+    numeric_cols = df.select_dtypes(include=np.number).columns.tolist()
+    if len(numeric_cols) >= 2:
+        x_axis = st.selectbox("Select X-axis", numeric_cols)
+        y_axis = st.selectbox("Select Y-axis", numeric_cols, index=1)
+        color_col = st.selectbox("Select Color Column (Optional)", [None] + df.columns.tolist())
+        fig = px.scatter(df, x=x_axis, y=y_axis, color=color_col, title=f'Scatter Plot of {y_axis} vs {x_axis}')
+        st.plotly_chart(fig)
+    else:
+        st.write("Not enough numerical features to create scatter plots.")
