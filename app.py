@@ -1,5 +1,11 @@
+# app.py
+
 import streamlit as st
-from modules.data_loader import load_user_dataset, load_builtin_dataset
+from modules.data_access.data_loader import load_user_dataset, load_builtin_dataset
+from modules.utils.logger import get_logger
+from modules.utils.exceptions import DataLoaderException
+
+logger = get_logger(__name__)
 
 def main():
     st.title("Machine Learning and Deep Learning App")
@@ -11,8 +17,9 @@ def main():
 
     if dataset_source == 'Upload Your Own Dataset':
         df = load_user_dataset()
+        dataset_name = 'User Dataset'
     else:
-        builtin_datasets = ['Iris', 'Wine', 'Breast Cancer', 'Diabetes', 'California Housing']
+        builtin_datasets = ['Iris', 'Wine', 'Breast Cancer', 'Diabetes', 'Boston Housing', 'California Housing']
         dataset_name = st.sidebar.selectbox("Select a Built-in Dataset", builtin_datasets)
         df = load_builtin_dataset(dataset_name)
 
@@ -28,5 +35,12 @@ def main():
         # Proceed with further steps (e.g., preprocessing, modeling)
         # ...
 
+    else:
+        st.warning("No dataset loaded. Please upload a dataset or select a built-in one.")
+
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except Exception as e:
+        st.error(f"An unexpected error occurred: {e}")
+        logger.error(f"Unexpected error: {e}")

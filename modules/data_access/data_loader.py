@@ -4,7 +4,7 @@ from sklearn import datasets
 import os
 from ..utils.logger import get_logger
 from ..utils.exceptions import DataLoaderException
-from ...configs.config import DATA_DIRECTORY
+from configs.config import DATA_DIRECTORY
 
 logger = get_logger(__name__)
 
@@ -52,7 +52,6 @@ def load_builtin_dataset(name):
             'Wine': datasets.load_wine,
             'Breast Cancer': datasets.load_breast_cancer,
             'Diabetes': datasets.load_diabetes,
-            'Boston Housing': datasets.load_boston,
             'California Housing': datasets.fetch_california_housing
         }
 
