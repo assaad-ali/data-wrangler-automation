@@ -71,3 +71,18 @@ def plot_box_plots(df):
     for col in selected_cols:
         fig = px.box(df, y=col, title=f'Box Plot of {col}')
         st.plotly_chart(fig)
+
+def plot_correlation_matrix(df):
+    st.subheader("Correlation Matrix Heatmap")
+    numeric_cols = df.select_dtypes(include=np.number).columns.tolist()
+    if numeric_cols:
+        selected_cols = st.multiselect("Select Numerical Columns for Correlation Matrix", numeric_cols, default=numeric_cols)
+        if len(selected_cols) >= 2:
+            corr_matrix = df[selected_cols].corr()
+            fig = plt.figure(figsize=(10, 8))
+            sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', fmt='.2f')
+            st.pyplot(fig)
+        else:
+            st.write("Select at least two numerical columns.")
+    else:
+        st.write("No numerical features available for correlation matrix.")
