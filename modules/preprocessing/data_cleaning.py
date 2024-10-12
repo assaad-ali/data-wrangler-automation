@@ -62,3 +62,36 @@ class DataCleaner:
             logger.error(f"Error in removing duplicates: {e}")
             st.error(f"Error in removing duplicates: {e}")
             return df
+
+    @staticmethod
+    def handle_outliers(df, method='zscore', threshold=3):
+        """
+        Handle outliers in the DataFrame.
+
+        Parameters:
+        - df: Pandas DataFrame
+        - method: Method to detect outliers ('zscore', 'iqr')
+        - threshold: Threshold for outlier detection
+
+        Returns:
+        - df_outliers_handled: DataFrame with outliers handled
+        """
+        try:
+            numeric_cols = df.select_dtypes(include=['float64', 'int64']).columns
+            if method == 'zscore':
+                from scipy import stats
+                z_scores = stats.zscore(df[numeric_cols])
+                abs_z_scores = abs(z_scores)
+                filtered_entries = (abs_z_scores < threshold).all(axis=1)
+                df = df[filtered_entries]
+            elif method == 'iqr':
+                Q1 = df[numeric_cols].quantile(0.25)
+                Q3 = df[numeric_cols].quantile(0.75)
+                IQR = Q3 - Q1
+                df = df[~((df[numeric_cols] < (Q1 - threshold * IQR)) | (df[numeric_cols] > (Q3 + threshold * IQR))).any(axis=1)]
+            logger.info(f"Outliers handled using method: {method}")
+            return df
+        except Exception as e:
+            logger.error(f"Error in handling outliers: {e}")
+            st.error(f"Error in handling outliers: {e}")
+            return df
