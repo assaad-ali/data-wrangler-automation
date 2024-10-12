@@ -40,3 +40,25 @@ class DataCleaner:
             logger.error(f"Error in handling missing values: {e}")
             st.error(f"Error in handling missing values: {e}")
             return df
+
+    @staticmethod
+    def remove_duplicates(df):
+        """
+        Remove duplicate rows from the DataFrame.
+
+        Parameters:
+        - df: Pandas DataFrame
+
+        Returns:
+        - df_deduped: DataFrame without duplicate rows
+        """
+        try:
+            initial_shape = df.shape
+            df = df.drop_duplicates()
+            final_shape = df.shape
+            logger.info(f"Removed duplicates. Shape changed from {initial_shape} to {final_shape}.")
+            return df
+        except Exception as e:
+            logger.error(f"Error in removing duplicates: {e}")
+            st.error(f"Error in removing duplicates: {e}")
+            return df
