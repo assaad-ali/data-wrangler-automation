@@ -1,3 +1,14 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from pandas.api.types import (
+    is_numeric_dtype,
+    is_datetime64_any_dtype,
+    is_string_dtype,
+)
+from pandas import CategoricalDtype
+import plotly.express as px
 import streamlit as st
 import time
 from modules.utils.logger import get_logger
@@ -45,7 +56,7 @@ def statistical_summaries(df):
         st.write("No numerical features selected.")
 
     # Categorical features
-    categorical_cols = [col for col in columns if is_categorical_dtype(df[col]) or df[col].dtype == 'object']
+    categorical_cols = [col for col in columns if isinstance(df[col].dtype, CategoricalDtype) or df[col].dtype == 'object']
     if categorical_cols:
         if st.checkbox("Show Categorical Features Summary"):
             for col in categorical_cols:
@@ -126,28 +137,98 @@ def categorical_vs_numerical(df):
     else:
         st.write("Insufficient categorical or numerical features for this analysis.")
 
+def plot_missing_values(df):
+    st.subheader("Missing Data Heatmap")
+    if df.isnull().sum().sum() > 0:
+        fig = plt.figure(figsize=(10, 6))
+        sns.heatmap(df.isnull(), cbar=False, cmap='viridis')
+        st.pyplot(fig)
+    else:
+        st.write("No missing values in the dataset.")
+
+
+
 def data_filtering(df):
     st.subheader("Data Filtering")
+
+    # Allow the user to select columns to filter
     filter_columns = st.multiselect("Select Columns to Filter", df.columns.tolist())
-    query = ""
+
+    if not filter_columns:
+        st.info("Please select at least one column to filter.")
+        return df
+
+    # Initialize a dictionary to hold filter conditions
+    filter_conditions = {}
+
     for col in filter_columns:
         if is_numeric_dtype(df[col]):
+            st.write(f"**Filtering options for numeric column:** `{col}`")
             min_val = float(df[col].min())
             max_val = float(df[col].max())
-            values = st.slider(f"Select range for {col}", min_val, max_val, (min_val, max_val))
-            query += f"({col} >= {values[0]}) & ({col} <= {values[1]}) & "
-        elif is_categorical_dtype(df[col]) or df[col].dtype == 'object':
-            options = st.multiselect(f"Select values for {col}", df[col].unique())
+            step = (max_val - min_val) / 100 if max_val != min_val else 1.0
+            # Add slider for numeric columns
+            values = st.slider(
+                f"Select range for `{col}`",
+                min_value=min_val,
+                max_value=max_val,
+                value=(min_val, max_val),
+                step=step,
+            )
+            filter_conditions[col] = df[col].between(values[0], values[1])
+
+        elif is_datetime64_any_dtype(df[col]):
+            st.write(f"**Filtering options for datetime column:** `{col}`")
+            min_date = df[col].min()
+            max_date = df[col].max()
+            # Add date input for datetime columns
+            values = st.date_input(
+                f"Select date range for `{col}`",
+                [min_date.date(), max_date.date()],
+                min_value=min_date.date(),
+                max_value=max_date.date(),
+            )
+            if len(values) == 2:
+                start_date = pd.to_datetime(values[0])
+                end_date = pd.to_datetime(values[1])
+                filter_conditions[col] = df[col].between(start_date, end_date)
+
+        elif isinstance(df[col].dtype, CategoricalDtype):
+            st.write(f"**Filtering options for categorical column:** `{col}`")
+            # Add multiselect for categorical columns
+            options = st.multiselect(f"Select values for `{col}`", df[col].unique())
             if options:
-                query += f"({col} in @options) & "
-    if query:
-        query = query.rstrip(" & ")
-        filtered_df = df.query(query)
-        st.write(f"Filtered Data (showing top 5 rows):")
-        st.write(filtered_df.head())
+                filter_conditions[col] = df[col].isin(options)
+
+        elif is_string_dtype(df[col]):
+            st.write(f"**Filtering options for string column:** `{col}`")
+            filter_option = st.selectbox(
+                f"Select filter type for `{col}`",
+                ["Contains", "Starts with", "Ends with", "Exact match", "Regex"],
+            )
+            filter_value = st.text_input(f"Enter text to filter `{col}`")
+
+            if filter_value:
+                if filter_option == "Contains":
+                    filter_conditions[col] = df[col].str.contains(filter_value, na=False, case=False)
+                elif filter_option == "Starts with":
+                    filter_conditions[col] = df[col].str.startswith(filter_value, na=False)
+                elif filter_option == "Ends with":
+                    filter_conditions[col] = df[col].str.endswith(filter_value, na=False)
+                elif filter_option == "Exact match":
+                    filter_conditions[col] = df[col] == filter_value
+                elif filter_option == "Regex":
+                    filter_conditions[col] = df[col].str.match(filter_value, na=False)
+        else:
+            st.warning(f"Column `{col}` has an unsupported data type and will be ignored.")
+
+    # Apply all filter conditions
+    if filter_conditions:
+        filtered_df = df.copy()
+        for col, condition in filter_conditions.items():
+            filtered_df = filtered_df[condition]
+        st.write(f"Total rows after filtering: {len(filtered_df)}")
         return filtered_df
     else:
         st.write("No filters applied.")
         return df
-
-
