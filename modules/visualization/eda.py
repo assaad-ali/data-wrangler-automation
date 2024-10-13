@@ -232,3 +232,67 @@ def data_filtering(df):
     else:
         st.write("No filters applied.")
         return df
+
+
+
+def run_eda(df):
+    st.title("🔍 Exploratory Data Analysis (EDA)")
+
+    # Create progress spinner to indicate loading
+    with st.spinner("Loading Data Overview..."):
+        time.sleep(0.8)  # Simulate loading time
+        data_overview(df)
+    
+    # Use tabs for a smoother navigation
+    tab1, tab2, tab3, tab4 = st.tabs(["📊 Data Summary", "⏳ Data Filtering", "📈 Visualizations", "📊 Advanced EDA"])
+
+    # Data Filtering
+    with tab2:
+        with st.expander("Data Filtering", expanded=False):
+            st.write("Use the filters below to narrow down the data:")
+            df_filtered = data_filtering(df)
+            st.write("### Filtered Data Preview")
+            st.write(df_filtered.head(10))
+
+    # Statistical Summaries
+    with tab1:
+        st.subheader("Statistical Summaries")
+        statistical_summaries(df_filtered)
+
+        # Missing Data Visualization
+        if st.checkbox("Show Missing Data Visualization"):
+            plot_missing_values(df_filtered)
+
+    # Visualizations
+    with tab3:
+        st.subheader("Visualizations")
+        st.write("Select visualizations to display:")
+        visualization_options = st.multiselect(
+            "Choose visualizations",
+            ['Histograms', 'Box Plots', 'Correlation Matrix', 'Scatter Plots', 'Pair Plot', 'Categorical vs Numerical'],
+            help="Select the types of visualizations you'd like to explore."
+        )
+
+        if 'Histograms' in visualization_options:
+            plot_histograms(df_filtered)
+
+        if 'Box Plots' in visualization_options:
+            plot_box_plots(df_filtered)
+
+        if 'Correlation Matrix' in visualization_options:
+            plot_correlation_matrix(df_filtered)
+
+        if 'Scatter Plots' in visualization_options:
+            plot_scatter_plots(df_filtered)
+
+        if 'Pair Plot' in visualization_options:
+            plot_pair_plots(df_filtered)
+
+        if 'Categorical vs Numerical' in visualization_options:
+            categorical_vs_numerical(df_filtered)
+
+    # Advanced EDA (Optional enhancements)
+    with tab4:
+        st.subheader("Advanced EDA")
+        st.write("🚧 Additional analysis options coming soon.")
+
