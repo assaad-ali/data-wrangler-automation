@@ -1,6 +1,8 @@
 import streamlit as st
 from sklearn.impute import SimpleImputer, KNNImputer
 from modules.utils.logger import get_logger
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 logger = get_logger(__name__)
 
@@ -95,3 +97,9 @@ class DataCleaner:
             logger.error(f"Error in handling outliers: {e}")
             st.error(f"Error in handling outliers: {e}")
             return df
+    @staticmethod
+    def visualize_outliers(df):
+        for col in df.columns:
+            fig, ax = plt.subplots()
+            sns.boxplot(data=df, x=col, ax=ax)
+            st.pyplot(fig)
