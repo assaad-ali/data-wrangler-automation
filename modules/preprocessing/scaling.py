@@ -1,6 +1,8 @@
 import streamlit as st
-from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler, MaxAbsScaler
 from modules.utils.logger import get_logger
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 logger = get_logger(__name__)
 
@@ -21,6 +23,9 @@ class Scaler:
             numeric_cols = df.select_dtypes(include=['float64', 'int64']).columns
             scaler = None
 
+            if method == 'maxabs':
+                scaler = MaxAbsScaler()
+
             if method == 'standard':
                 scaler = StandardScaler()
             elif method == 'minmax':
@@ -38,3 +43,10 @@ class Scaler:
             logger.error(f"Error in scaling features: {e}")
             st.error(f"Error in scaling features: {e}")
             return df
+        
+    @staticmethod
+    def visualize_distributions(df):
+        for col in df.columns:
+            fig, ax = plt.subplots()
+            sns.histplot(df[col], kde=True, ax=ax)
+            st.pyplot(fig)
