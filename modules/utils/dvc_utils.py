@@ -4,23 +4,23 @@ from modules.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-def run_command(command):
+def run_command(command, cwd=None):
     """
     Run a shell command and return the result.
     """
     try:
         result = subprocess.run(
-            command, capture_output=True, text=True, shell=True
+            command, capture_output=True, text=True, cwd=cwd
         )
         if result.returncode != 0:
-            logger.error(f"Command failed: {command}\n{result.stderr}")
+            logger.error(f"Command failed: {' '.join(command)}\n{result.stderr}")
         else:
-            logger.info(f"Command succeeded: {command}\n{result.stdout}")
-        return result.returncode
+            logger.info(f"Command succeeded: {' '.join(command)}\n{result.stdout}")
+        return result
     except Exception as e:
-        logger.error(f"Exception running command: {command}\n{e}")
-        return 1
-
+        logger.error(f"Exception running command: {' '.join(command)}\n{e}")
+        return None
+    
 def check_dvc_initialized():
     return os.path.isdir(".dvc")
 
