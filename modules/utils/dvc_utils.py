@@ -107,7 +107,6 @@ def check_gdrive_configured(remote_name):
 def setup_gdrive_remote(remote_name, folder_id):
     try:
         run_command(f"dvc remote add -d {remote_name} gdrive://{folder_id}")
-        run_command(f"dvc remote modify {remote_name} gdrive_use_service_account true")
 
         logger.info("Google Drive remote setup complete.")
 
@@ -123,3 +122,4 @@ def modify_gdrive_remote(remote_name, client_id, client_secret):
         
     except Exception as e:
         logger.error(f"Error modifying Google Drive remote: {e}")
+
