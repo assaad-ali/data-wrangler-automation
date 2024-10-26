@@ -2,101 +2,164 @@
 
 ## **Introduction**
 
-This project is a **Streamlit-based application** designed to automate various steps of data wrangling, preprocessing, and exploratory data analysis (EDA). The app allows users to upload datasets or select built-in datasets for analysis, and then apply a variety of preprocessing techniques to clean and transform the data for machine learning (ML) model development.
+This project is a **Streamlit-based application** to automate tasks of data wrangling, preprocessing, and exploratory data analysis (EDA). The app allows users to upload datasets or select from built-in datasets for analysis, and then apply preprocessing techniques to clean and transform the data for machine learning (ML) model development.
 
 
-## **Key Features**
+## Features
 
-- **Data Ingestion**: Upload your own datasets (CSV, Excel) or use built-in datasets (Iris, Wine, Breast Cancer, California Housing).
-- **Exploratory Data Analysis (EDA)**:
-  - Data summaries (shape, data types, missing values).
-  - Advanced data filtering by numerical ranges, categorical selections, or string-based conditions.
-  - Visualizations including histograms, box plots, scatter plots, and correlation matrix.
-  - Pair plots to explore feature relationships.
-- **Data Preprocessing**:
-  - Handle missing values with multiple imputation strategies (mean, median, constant, KNN).
-  - Outlier detection and handling (z-score, IQR, quantile) with visual feedback.
-  - Feature scaling with multiple methods (standard, min-max, robust, max-abs).
-  - Categorical variable encoding (label, one-hot, ordinal, binary).
+- **Dataset Upload and Selection**
+  - Upload your own dataset in CSV, Excel, or JSON format.
+  - Choose from built-in datasets: Iris, Wine, Breast Cancer, Diabetes, and California Housing.
+
+- **Exploratory Data Analysis (EDA)**
+  - **Data Overview**: View dataset shape, data types, missing values, and duplicate rows.
+  - **Statistical Summaries**: Get descriptive statistics for numerical and categorical features.
+  - **Data Visualization**: Generate histograms, box plots, correlation matrices, scatter plots, pair plots, and categorical vs numerical analyses.
+  - **Data Filtering**: Filter data based on numerical ranges, categorical values, date ranges, or string patterns.
+
+- **Data Preprocessing**
+  - **Handle Missing Values**: Impute missing values using strategies like mean, median, most frequent, constant, KNN, or iterative imputation.
+  - **Handle Outliers**: Detect and handle outliers using methods like Z-score, IQR, or quantile-based methods.
+  - **Remove Duplicates**: Identify and remove duplicate rows from the dataset.
+  - **Feature Scaling**: Scale numerical features using StandardScaler, MinMaxScaler, RobustScaler, or MaxAbsScaler.
+  - **Encode Categorical Variables**: Encode categorical features using label encoding or one-hot encoding.
+  - **Data Version Control**: Track preprocessing steps using DVC with options to configure remote storage.
+
+- **Data Drift Detection**
+  - Detect data drift between reference and current datasets using the Evidently library.
+  - Visualize data drift reports within the app.
+
+- **DVC Integration**
+  - Initialize and configure DVC directly from the app.
+  - Add and commit datasets to DVC tracking.
+  - Configure remote storage with S3 or Google Drive.
+  - Push changes to remote repositories.
+  
 
 ## **Project Structure**
 
-```plaintext
+```
 data-wrangler-automation/
-├── app.py                          # Main application file
-├── requirements.txt                # Dependencies
-├── README.md                       # Project documentation
-├── configs/                        
-│   └── config.py                   # Configuration settings for the app
+├── app.py                
+├── requirements.txt      
+├── README.md             
+├── configs/
+│   └── config.py
 ├── modules/
-│   ├── data_access/                
-│   │   └── data_loader.py          # Data loading functions   
-│   ├── preprocessing/              
-│   │   ├── data_cleaning.py        # Functions for data cleaning
-│   │   ├── data_scaling.py         # Functions for feature scaling
-│   │   └── data_encoding.py        # Functions for categorical encoding
-│   ├── services/                   
-│   │   └── data_preprocessing.py   # Main preprocessing service functions
-│   └── visualization/              
-│       └── data_visualization.py   # Functions for EDA visualization
+│   ├── data_access/
+│   │   └── data_loader.py
+│   ├── preprocessing/
+│   │   ├── data_cleaning.py
+│   │   ├── encoding.py
+│   │   └── scaling.py
+│   ├── services/
+│   │   ├── dvc_service.py
+│   │   └── preprocessing_service.py
+│   ├── utils/
+│   │   ├── dvc_utils.py
+│   │   └── logger.py
+│   └── visualization/
+│       └── eda.py
 
 ```
 
 
-## **Installation**
+## Installation
 
-1. Clone the repository:
+### Prerequisites
 
-    ```bash
-    git clone https://github.com/assaad-ali/data-wrangler-automation.git
-    ```
+#### **External Tools**
+    - [Git](https://git-scm.com/downloads)
+    - [DVC](https://dvc.org/doc/install)
+    - Python 3.7 or higher
+    - pip package manager
 
-2. Navigate to the project directory:
 
-    ```bash
-    cd data-wrangler-automation
-    ```
+### Clone the Repository
 
-3. Install the required dependencies:
+```bash
+git clone <https://github.com/assaad-ali/data-wrangler-automation.git>
+cd data-wrangling-app
+```
 
-    ```bash
-    pip install -r requirements.txt
-    ```
+### Create a Virtual Environment
 
-4. Run the Streamlit app:
+It's recommended to use a virtual environment to manage dependencies.
 
-    ```bash
-    streamlit run app.py
-    ```
+```bash
+python -m venv venv
+# Activate the virtual environment
+# On Windows:
+venv\Scripts\activate
+# On macOS/Linux:
+source venv/bin/activate
+```
 
+### Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### Environment Variables
+
+Create a `.env` file in the root directory to store environment variables like `MONGODB_URI`:
+
+```env
+MONGODB_URI=your_mongodb_connection_string
+```
 
 ## **How to Use**
 
-### **1. Data Ingestion**
+### Running the App
 
-- **Upload a Dataset**: You can upload your own dataset in `.csv`, `.xls`, `.xlsx`, or `.json` formats.
-- **Use a Built-in Dataset**: Select from preloaded datasets like Iris, Wine, Breast Cancer, Diabetes, and California Housing.
+```bash
+streamlit run app.py
+```
 
-### **2. Exploratory Data Analysis (EDA)**
+This will start the Streamlit app, and you can access it in your web browser at `http://localhost:8501`.
 
-- **Data Preview**: View a preview of your dataset's head, tail, and random samples.
-- **Visualizations**:
-  - Histograms, Box Plots, Scatter Plots, and Correlation Matrix.
-  - Explore relationships between categorical and numerical features.
-  - Visualize missing data with heatmaps.
+### Using the App
 
-### **3. Data Preprocessing**
+1. **Dataset Selection**
+   - In the sidebar, choose to upload your own dataset or select a built-in dataset.
+   - If uploading, select your dataset file (CSV, Excel, or JSON).
+   - If using a built-in dataset, select one from the dropdown menu.
 
-- **Handle Missing Values**: Choose from various imputation strategies such as mean, median, most frequent, and more.
-- **Remove Duplicates**: Automatically remove duplicate rows.
-- **Handle Outliers**: Detect and handle outliers using Z-score, IQR, or quantiles.
-- **Feature Scaling**: Apply standard scaling, min-max scaling, robust scaling, or max-abs scaling.
-- **Encode Categorical Variables**: Label encode or one-hot encode categorical features.
+2. **Data Preview**
+   - View a preview of your dataset (head, tail, or random sample).
+   - See the dataset shape and basic information.
 
-### **4. Finishing Preprocessing**
+3. **Task Selection**
+   - Choose between **Exploratory Data Analysis** and **Data Preprocessing** from the sidebar.
 
-Once preprocessing is complete, the app will display a preview of the preprocessed data. You can then download the dataset and proceed to further steps in your data science workflow, such as feature engineering or model building.
+4. **Exploratory Data Analysis**
+   - **Data Overview**: Get insights into data types, missing values, and duplicates.
+   - **Statistical Summaries**: View descriptive statistics.
+   - **Visualizations**: Generate various plots to understand data distributions and relationships.
+   - **Data Filtering**: Apply filters to focus on specific subsets of data.
 
+5. **Data Preprocessing**
+   - **Select Columns**: Choose which columns to include in preprocessing.
+   - **Handle Missing Values**: Impute missing values with various strategies.
+   - **Handle Outliers**: Detect and handle outliers using Z-score, IQR, or quantile methods.
+   - **Remove Duplicates**: Eliminate duplicate rows.
+   - **Feature Scaling**: Scale numerical features.
+   - **Encode Categorical Variables**: Convert categorical data into numerical formats.
+   - **DVC Tracking**: Optionally track preprocessing steps using DVC.
+
+6. **Data Drift Detection**
+   - Use the Evidently library to detect and visualize data drift between different datasets.
+
+7. **DVC Integration**
+   - Initialize DVC and Git repositories directly from the app.
+   - Configure remote storage options (S3 or Google Drive).
+   - Add, commit, and push changes to remote repositories.
+
+
+## Logging
+
+Logs are saved in the `logs` directory as specified in `configs/config.py`. Logging is configured in `modules/utils/logger.py`.
 
 
 ## **Contributing**
